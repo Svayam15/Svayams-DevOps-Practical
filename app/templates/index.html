@@ -50,7 +50,8 @@ async function load() {
 
 document.getElementById('form').onsubmit = async (e) => {
   e.preventDefault(); msg.textContent = '';
-  const body = {name: name.value, email: email.value, course: course.value};
+    const field = (id) => document.getElementById(id).value;
+  const body = {name: field('name'), email: field('email'), course: field('course')};
   const r = await fetch('/api/students', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
   if (!r.ok) { msg.textContent = (await r.json()).error; return; }
   e.target.reset(); load();
