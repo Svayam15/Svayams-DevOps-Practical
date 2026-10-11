@@ -71,11 +71,11 @@ pipeline {
             }
         }
 
-        stage('Image Scan (Trivy)') {
+                stage('Image Scan (Trivy)') {
             steps {
                 script {
                     def rc = bat(returnStatus: true,
-                        script: 'trivy image --severity HIGH,CRITICAL --exit-code 1 --output reports\\trivy-%VERSION%.txt %APP_NAME%:%VERSION%')
+                        script: 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v trivy-cache:/root/.cache/ aquasec/trivy:latest image --severity HIGH,CRITICAL --exit-code 1 %APP_NAME%:%VERSION% > reports\\trivy-%VERSION%.txt')
                     bat 'type reports\\trivy-%VERSION%.txt'
                     if (rc != 0) { unstable('Trivy found HIGH/CRITICAL vulnerabilities in the image') }
                 }
