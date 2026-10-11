@@ -1,0 +1,14 @@
+venv/
+.git/
+__pycache__/
+*.pyc
+instance/
+*.db
+reports/
+dist/
+tests/
+docs/
+k8s/
+monitoring/
+.github/
+Jenkinsfile

@@ -1,0 +1,35 @@
+# Local run:  docker compose up --build
+#   App         http://localhost:5000
+#   Prometheus  http://localhost:9090
+#   Grafana     http://localhost:3000   (admin / admin)
+services:
+  web:
+    build:
+      context: .
+      args:
+        APP_VERSION: local
+    ports:
+      - "5000:5000"
+    environment:
+      APP_ENV: local
+    volumes:
+      - student-data:/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - web
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  student-data:

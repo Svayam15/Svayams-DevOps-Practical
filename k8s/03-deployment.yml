@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-app
+  namespace: student
+  labels:
+    app: student-app
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5          # keeps old ReplicaSets so rollback works
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1                  # one extra pod during an update
+      maxUnavailable: 0            # never drop below the desired count
+  selector:
+    matchLabels:
+      app: student-app
+  template:
+    metadata:
+      labels:
+        app: student-app
+    spec:
+      containers:
+        - name: student-app
+          image: student-app:latest        # Jenkins overwrites this with student-app:<version>
+          imagePullPolicy: IfNotPresent    # image is loaded into Minikube, not pulled
+          ports:
+            - name: http
+              containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: student-app-config
+            - secretRef:
+                name: student-app-secret
+          # SQLite lives in the pod: each replica has its own data and it is lost
+          # when the pod restarts. Fine for this demo; see README "Known limits".
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+      volumes:
+        - name: data
+          emptyDir: {}

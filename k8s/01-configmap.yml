@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: student-app-config
+  namespace: student
+data:
+  APP_ENV: "minikube"
+  LOG_LEVEL: "INFO"

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Management System</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:860px;margin:2rem auto;padding:0 1rem;color:#1f2937}
+  h1{margin-bottom:.2rem} .sub{color:#6b7280;margin-top:0}
+  form{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:.5rem;margin:1.2rem 0}
+  input,button{padding:.5rem;border:1px solid #d1d5db;border-radius:6px;font-size:1rem}
+  button{background:#2563eb;color:#fff;border-color:#2563eb;cursor:pointer}
+  button.del{background:#dc2626;border-color:#dc2626;padding:.25rem .6rem}
+  table{width:100%;border-collapse:collapse} th,td{text-align:left;padding:.5rem;border-bottom:1px solid #e5e7eb}
+  #msg{min-height:1.4rem;color:#b91c1c}
+  footer{margin-top:2rem;color:#9ca3af;font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>Student Management System</h1>
+<p class="sub">Flask + SQLite &middot; deployed through a Jenkins CI/CD pipeline</p>
+<form id="form">
+  <input id="name" placeholder="Name" required>
+  <input id="email" type="email" placeholder="Email" required>
+  <input id="course" placeholder="Course">
+  <button>Add</button>
+</form>
+<div id="msg"></div>
+<table>
+  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th><th></th></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+<footer>Version {{ version }}</footer>
+<script>
+const rows = document.getElementById('rows'), msg = document.getElementById('msg');
+const cell = (text) => { const td = document.createElement('td'); td.textContent = text; return td; };
+
+async function load() {
+  const students = await (await fetch('/api/students')).json();
+  rows.replaceChildren(...students.map(s => {
+    const tr = document.createElement('tr');
+    const del = document.createElement('button');
+    del.textContent = 'Delete'; del.className = 'del';
+    del.onclick = async () => { await fetch('/api/students/' + s.id, {method: 'DELETE'}); load(); };
+    const last = document.createElement('td'); last.appendChild(del);
+    tr.append(cell(s.id), cell(s.name), cell(s.email), cell(s.course), last);
+    return tr;
+  }));
+}
+
+document.getElementById('form').onsubmit = async (e) => {
+  e.preventDefault(); msg.textContent = '';
+  const body = {name: name.value, email: email.value, course: course.value};
+  const r = await fetch('/api/students', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  if (!r.ok) { msg.textContent = (await r.json()).error; return; }
+  e.target.reset(); load();
+};
+load();
+</script>
+</body>
+</html>
