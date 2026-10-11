@@ -13,8 +13,10 @@ pipeline {
                      description: 'Deploy to Minikube')
     }
 
-    environment {
+        environment {
         APP_NAME = 'student-app'
+        KUBECONFIG = 'C:\\Users\\svaya\\.kube\\config'
+        MINIKUBE_HOME = 'C:\\Users\\svaya'
     }
 
     stages {
