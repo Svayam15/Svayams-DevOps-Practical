@@ -23,3 +23,11 @@ def test_metrics_exposed(client, sample):
     assert "http_requests_total" in text
     assert "http_request_duration_seconds" in text
     assert "students_total 1.0" in text
+
+
+def test_ui_reads_form_fields_explicitly(client):
+    # Regression: bare `name.value` resolves to window.name in browsers, so the
+    # name was never sent. The page must look inputs up by id.
+    html = client.get("/").get_data(as_text=True)
+    assert "name.value" not in html.replace("field('name')", "")
+    assert "document.getElementById(id).value" in html
