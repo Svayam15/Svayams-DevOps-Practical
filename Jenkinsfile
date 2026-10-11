@@ -114,8 +114,8 @@ pipeline {
                 stage('Deploy to Minikube') {
             when { expression { params.DEPLOY_TO_K8S } }
             steps {
-                bat 'kubectl apply -f k8s/'
-                bat 'kubectl -n student set image deployment/student-app student-app=%DOCKERHUB_USER%/%APP_NAME%:%VERSION%'
+                bat 'kubectl apply -f k8s/00-namespace.yml -f k8s/01-configmap.yml -f k8s/02-secret.yml -f k8s/04-service.yml -f k8s/05-hpa.yml'
+                bat 'powershell -Command "(Get-Content k8s\\03-deployment.yml) -replace \'image: student-app:latest\', \'image: %DOCKERHUB_USER%/%APP_NAME%:%VERSION%\' | kubectl apply -f -"'
                 bat 'kubectl -n student rollout status deployment/student-app --timeout=180s'
             }
             post {
