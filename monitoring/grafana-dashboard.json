@@ -47,8 +47,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (endpoint) (rate(http_requests_total[1m]))",
-          "legendFormat": "{{endpoint}}",
+          "expr": "sum by (exported_endpoint) (rate(http_requests_total[1m]))",
+          "legendFormat": "{{exported_endpoint}}",
           "refId": "A"
         }
       ]
@@ -103,7 +103,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m]))",
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m])) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }

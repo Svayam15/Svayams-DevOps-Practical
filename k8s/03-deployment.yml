@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: student-app
-          image: student-app:latest        # Jenkins overwrites this with student-app:<version>
+          image: student-app:latest        # placeholder: the Jenkinsfile swaps in <dockerhub-user>/student-app:<version> before applying   
           imagePullPolicy: IfNotPresent    # image is loaded into Minikube, not pulled
           ports:
             - name: http

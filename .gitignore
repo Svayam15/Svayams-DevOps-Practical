@@ -6,3 +6,5 @@ instance/
 reports/
 dist/
 .pytest_cache/
+.idea/
+lol.zip*.zip
